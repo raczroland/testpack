@@ -105,7 +105,7 @@ var SchedulerComponent = /** @class */ (function () {
 SchedulerComponent.decorators = [
     { type: Component, args: [{
                 selector: 'eg-ui-scheduler',
-                template: "\n    <div>Ez az m\u00E1sodik</div>\n    <div #scheduler></div>\n  ",
+                template: "\n    <div>Ez a harmadik. :)))))))</div>\n    <div #scheduler></div>\n  ",
                 styles: [""]
             },] },
 ];
