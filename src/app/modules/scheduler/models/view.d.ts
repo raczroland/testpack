@@ -1,0 +1,32 @@
+import { ViewEditable } from './view-editable';
+import { ViewGroup } from './view-group';
+export declare class View {
+    allDayEventTemplate?: string;
+    allDaySlot?: boolean;
+    allDaySlotTemplate?: string;
+    columnWidth?: number;
+    dateHeaderTemplate?: string;
+    dayTemplate?: string;
+    editable?: boolean | ViewEditable;
+    endTime?: Date;
+    eventDateTemplate?: string;
+    eventHeight?: number;
+    eventTemplate?: string;
+    eventTimeTemplate?: string;
+    group?: ViewGroup;
+    majorTick?: number;
+    majorTimeHeaderTemplate?: string;
+    minorTickCount?: number;
+    minorTimeHeaderTemplate?: string;
+    name?: string;
+    selected?: boolean;
+    selectedDateFormat?: string;
+    selectedShortDateFormat?: string;
+    showWorkHours?: boolean;
+    slotTemplate?: string;
+    startTime?: Date;
+    title?: string;
+    type?: string;
+    workWeekStart?: number;
+    workWeekEnd?: number;
+}
