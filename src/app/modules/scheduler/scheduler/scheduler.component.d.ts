@@ -1,12 +1,6 @@
 import { AfterViewInit, ElementRef, EventEmitter, OnChanges, OnDestroy } from '@angular/core';
-import { CurrentTimeMarker } from '../models/current-time-marker';
-import { Editable } from '../models/editable';
-import { Footer } from '../models/footer';
-import { Group } from '../models/group';
-import { View } from '../models/view';
-import { Resource } from '../models/resource';
-import { ViewOptions } from '../models/view-options';
-import { ViewPdf } from '../models/view-pdf';
+import { CurrentTimeMarker, Editable, Footer, Group, View, Resource, ViewOptions, ViewPdf } from '../models';
+import SchedulerMessages = kendo.ui.SchedulerMessages;
 export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnChanges {
     private elementRef;
     /**
@@ -26,7 +20,7 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
      */
     currentTimeMarker: boolean | CurrentTimeMarker;
     /**
-     * Események.
+     * The data source of the widget which contains the scheduler events.
      */
     dataSource: object | any[] | kendo.data.SchedulerDataSource;
     /**
@@ -80,7 +74,7 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
     /**
      * The configuration of the scheduler messages. Use this option to customize or localize the scheduler messages.
      */
-    messages: object;
+    messages: SchedulerMessages;
     /**
      * Constraints the minimum date which can be selected via the scheduler navigation.
      */
@@ -158,6 +152,10 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
      */
     workWeekEnd: number;
     /**
+     * Culture.
+     */
+    culture: string;
+    /**
      * Fired when a new event is about to be added.
      */
     add: EventEmitter<any>;
@@ -232,7 +230,7 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
     /**
      * Is the component initialized.
      */
-    initialized: boolean;
+    private initialized;
     /**
      * Constructor.
      */
@@ -240,7 +238,7 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
     /**
      * Changes happened.
      */
-    ngOnChanges(): void;
+    ngOnChanges(changes: any): void;
     /**
      * Initialization of the widget.
      */
@@ -249,7 +247,13 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
      * Destroy the widget.
      */
     ngOnDestroy(): void;
+    /**
+     * Creates the scheduler widget.
+     */
     private createScheduler();
+    /**
+     * Destroys the scheduler widget.
+     */
     private destroyScheduler();
     /**
      * Handling the events.
@@ -341,4 +345,8 @@ export declare class SchedulerComponent implements AfterViewInit, OnDestroy, OnC
      * The name of the current view. Can be used for refreshing the current view data.
      */
     viewName(): any;
+    /**
+     * Set events via dataSource.
+     */
+    setEvents(events: any[]): void;
 }

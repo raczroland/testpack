@@ -1,6 +1,8 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, NgModule } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, LOCALE_ID, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import '@progress/kendo-ui';
+import '@progress/kendo-ui/js/cultures/kendo.culture.hu-HU.js';
+import '@progress/kendo-ui/js/messages/kendo.messages.hu-HU.js';
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
@@ -8,6 +10,37 @@ import '@progress/kendo-ui';
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+/**
+ * Barrel for models.
  */
 /**
  * @fileoverview added by tsickle
@@ -21,10 +54,6 @@ var SchedulerComponent = /** @class */ (function () {
     function SchedulerComponent(elementRef) {
         this.elementRef = elementRef;
         /**
-         * The template used to render the "all day" scheduler events.
-         */
-        this.allDayEventTemplate = undefined;
-        /**
          * If set to true the scheduler will display a slot for "all day" events.
          */
         this.allDaySlot = true;
@@ -37,17 +66,9 @@ var SchedulerComponent = /** @class */ (function () {
          */
         this.currentTimeMarker = true;
         /**
-         * Események.
+         * The data source of the widget which contains the scheduler events.
          */
         this.dataSource = [];
-        /**
-         * The current date of the scheduler. Used to determine the period which is displayed by the widget.
-         */
-        this.date = undefined;
-        /**
-         * The template used to render the date header cells.
-         */
-        this.dateHeaderTemplate = undefined;
         /**
          * If set to true the user would be able to create new scheduler events and modify or delete existing ones.
          */
@@ -56,10 +77,6 @@ var SchedulerComponent = /** @class */ (function () {
          * The end time of the week and day views. The scheduler will display events ending before the endTime.
          */
         this.endTime = undefined;
-        /**
-         * The template used to render the scheduler events.
-         */
-        this.eventTemplate = undefined;
         /**
          * If set to false the footer of the scheduler would not be displayed.
          */
@@ -102,14 +119,7 @@ var SchedulerComponent = /** @class */ (function () {
         /**
          * The views displayed by the scheduler and their configuration.
          */
-        this.views = [
-            "day",
-            { type: "workWeek", selected: true },
-            "week",
-            "month",
-            "agenda",
-            { type: "timeline", eventHeight: 50 }
-        ];
+        this.views = ['day', 'week'];
         /**
          * The start of working week (index based)
          */
@@ -118,6 +128,10 @@ var SchedulerComponent = /** @class */ (function () {
          * The end of working week (index based).
          */
         this.workWeekEnd = 5;
+        /**
+         * Culture.
+         */
+        this.culture = 'hu-HU';
         /**
          * Fired when a new event is about to be added.
          */
@@ -189,21 +203,24 @@ var SchedulerComponent = /** @class */ (function () {
     }
     /**
      * Changes happened.
+     * @param {?} changes
      * @return {?}
      */
-    SchedulerComponent.prototype.ngOnChanges = function () {
-        console.log('>>>');
-        if (this.initialized) {
+    SchedulerComponent.prototype.ngOnChanges = function (changes) {
+        if (this.initialized && Object.keys(changes).some(function (key) { return key !== 'dataSource'; })) {
             this.destroyScheduler();
             this.createScheduler();
         }
-        // TODO use setDataSource instead
+        else if (this.initialized && changes.dataSource && (changes.dataSource.previousValue !== changes.dataSource.currentValue)) {
+            this.setEvents(changes.dataSource.currentValue);
+        }
     };
     /**
      * Initialization of the widget.
      * @return {?}
      */
     SchedulerComponent.prototype.ngAfterViewInit = function () {
+        kendo.culture(this.culture);
         this.createScheduler();
         this.initialized = true;
     };
@@ -215,6 +232,7 @@ var SchedulerComponent = /** @class */ (function () {
         this.destroyScheduler();
     };
     /**
+     * Creates the scheduler widget.
      * @return {?}
      */
     SchedulerComponent.prototype.createScheduler = function () {
@@ -275,19 +293,9 @@ var SchedulerComponent = /** @class */ (function () {
             save: this.handleEvent('save'),
         });
         this.scheduler = kendo.jQuery(this.schedulerEl.nativeElement).data('kendoScheduler');
-        // var dataSource = new kendo.data.SchedulerDataSource({
-        //   data: [
-        //     {
-        //       id: 1,
-        //       start: new Date("2013/6/6 08:00 AM"),
-        //       end: new Date("2013/6/6 09:00 AM"),
-        //       title: "Interview"
-        //     }
-        //   ]
-        // });
-        // this.scheduler.setDataSource(dataSource);
     };
     /**
+     * Destroys the scheduler widget.
      * @return {?}
      */
     SchedulerComponent.prototype.destroyScheduler = function () {
@@ -476,6 +484,14 @@ var SchedulerComponent = /** @class */ (function () {
     SchedulerComponent.prototype.viewName = function () {
         return this.scheduler.viewName();
     };
+    /**
+     * Set events via dataSource.
+     * @param {?} events
+     * @return {?}
+     */
+    SchedulerComponent.prototype.setEvents = function (events) {
+        this.setDataSource(new kendo.data.SchedulerDataSource({ data: events }));
+    };
     return SchedulerComponent;
 }());
 SchedulerComponent.decorators = [
@@ -526,6 +542,7 @@ SchedulerComponent.propDecorators = {
     "workDayEnd": [{ type: Input },],
     "workWeekStart": [{ type: Input },],
     "workWeekEnd": [{ type: Input },],
+    "culture": [{ type: Input },],
     "add": [{ type: Output },],
     "cancel": [{ type: Output },],
     "change": [{ type: Output },],
@@ -556,13 +573,18 @@ var SchedulerModule = /** @class */ (function () {
 SchedulerModule.decorators = [
     { type: NgModule, args: [{
                 imports: [
-                    CommonModule
+                    CommonModule,
                 ],
                 declarations: [
-                    SchedulerComponent
+                    SchedulerComponent,
                 ],
                 exports: [
                     SchedulerComponent,
+                ],
+                providers: [
+                    {
+                        provide: LOCALE_ID, useValue: 'hu-HU'
+                    },
                 ]
             },] },
 ];
