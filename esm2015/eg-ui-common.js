@@ -1,8 +1,14 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, LOCALE_ID, NgModule } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, LOCALE_ID, NgModule, ContentChild, ContentChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import '@progress/kendo-ui';
 import '@progress/kendo-ui/js/cultures/kendo.culture.hu-HU.js';
 import '@progress/kendo-ui/js/messages/kendo.messages.hu-HU.js';
+import { HttpClient, HttpParams, HttpClientModule } from '@angular/common/http';
+import { ColumnBase, DetailTemplateDirective, GridComponent, ToolbarTemplateDirective, GridModule } from '@progress/kendo-angular-grid';
+import { process } from '@progress/kendo-data-query';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /**
  * @fileoverview added by tsickle
@@ -601,6 +607,221 @@ SchedulerModule.ctorParameters = () => [];
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
  */
+class EgGridComponent {
+    /**
+     * @param {?} httpClient
+     */
+    constructor(httpClient) {
+        this.httpClient = httpClient;
+        /**
+         * Adatok tömbje.
+         */
+        this.data = [];
+        /**
+         * Rendezhetőség.
+         */
+        this.sortable = true;
+        /**
+         * Szűrhetőség.
+         */
+        this.filterable = true;
+        /**
+         * Csoportosítás.
+         */
+        this.groupable = true;
+        /**
+         * Lapozás.
+         */
+        this.pageable = true;
+        /**
+         * Lapméret.
+         */
+        this.pageSize = 10;
+        /**
+         * Méretezhetőség.
+         */
+        this.resizable = false;
+        /**
+         * Újrarendezhetőség.
+         */
+        this.reorderable = false;
+        /**
+         * Kiválaszhatóság.
+         */
+        this.selectable = false;
+        /**
+         * Billentyűzettel való irányítás.
+         */
+        this.navigable = false;
+        /**
+         * Ki legyen-e jelölve egy adott sor.
+         */
+        this.cellClick = new EventEmitter();
+        /**
+         * Állapot.
+         */
+        this.state = {
+            skip: 0,
+        };
+    }
+    /**
+     * @return {?}
+     */
+    ngOnInit() {
+        // Első adatbetöltés:
+        this.dataStateChange(this.state);
+    }
+    /**
+     * @return {?}
+     */
+    ngAfterViewInit() {
+        // Ha meg vannak adva oszlopok, beállítjuk őket:
+        if (this.columns && this.columns.length > 0) {
+            // columns:
+            const /** @type {?} */ columnsToRender = [...this.columns.toArray()];
+            // selectable:
+            if (this.selectable && this.checkboxColumn) {
+                columnsToRender.unshift(this.checkboxColumn);
+            }
+            this.columns.reset(columnsToRender);
+            this.grid.columns = this.columns;
+        }
+        // Ha van detail template, beállítjuk:
+        if (this.detailTemplate) {
+            this.grid.detailTemplate = this.detailTemplate;
+        }
+        // Ha van toolbar template, beállítjuk:
+        if (this.toolbarTemplate) {
+            this.grid.toolbarTemplate = this.toolbarTemplate;
+        }
+        // "Újratöltjük" a gridet:
+        this.grid.ngAfterContentInit();
+    }
+    /**
+     * Adatok betöltése az állapot alapján.
+     * @param {?} state
+     * @return {?}
+     */
+    dataStateChange(state) {
+        this.loadData().subscribe(data => {
+            const /** @type {?} */ newState = Object.assign({}, state, { take: this.pageSize });
+            this.gridView = process(data, newState);
+            this.state = newState;
+            console.log(this.state);
+        });
+    }
+    /**
+     * Adatok lekérése.
+     * @return {?}
+     */
+    loadData() {
+        // Ha van dataUrl megadva, lekérjük a szervertől az adatokat. Ellenkező esetben a data propertyt használjuk.
+        if (this.dataUrl) {
+            return this.httpClient.get(this.dataUrl, {
+                params: new HttpParams().append('state', JSON.stringify(this.state))
+            });
+        }
+        else {
+            return Observable.of(this.data);
+        }
+    }
+    /**
+     * @param {?} eventType
+     * @return {?}
+     */
+    event(eventType) {
+        return (event) => {
+            if (this[eventType] instanceof EventEmitter) {
+                this[eventType].emit(event);
+            }
+        };
+    }
+}
+EgGridComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'eg-grid',
+                template: `<kendo-grid
+  [data]="gridView"
+  [skip]="state.skip"
+  [pageSize]="pageSize"
+  [group]="state.group"
+  [filter]="state.filter"
+  [sort]="state.sort"
+  [sortable]="sortable"
+  [filterable]="filterable"
+  [groupable]="groupable"
+  [pageable]="pageable"
+  [resizable]="resizable"
+  [reorderable]="reorderable"
+  [selectable]="selectable"
+  [height]="height"
+  [navigable]="navigable"
+  [scrollable]="scrollable"
+  (dataStateChange)="dataStateChange($event)"
+  (cellClick)="event('cellClick')($event)"
+>
+  <kendo-grid-checkbox-column *ngIf="selectable && columns && columns.length > 0" #checkboxColumn showSelectAll="true"></kendo-grid-checkbox-column>
+  <!--<ng-content select="[kendoGridToolbarTemplate]" ngProjectAs="[kendoGridToolbarTemplate]"></ng-content>-->
+  <!--<ng-content select="kendo-grid-column" ngProjectAs="kendo-grid-column"></ng-content>-->
+</kendo-grid>
+`
+            },] },
+];
+/** @nocollapse */
+EgGridComponent.ctorParameters = () => [
+    { type: HttpClient, },
+];
+EgGridComponent.propDecorators = {
+    "data": [{ type: Input },],
+    "dataUrl": [{ type: Input },],
+    "sortable": [{ type: Input },],
+    "filterable": [{ type: Input },],
+    "groupable": [{ type: Input },],
+    "pageable": [{ type: Input },],
+    "pageSize": [{ type: Input },],
+    "resizable": [{ type: Input },],
+    "reorderable": [{ type: Input },],
+    "selectable": [{ type: Input },],
+    "height": [{ type: Input },],
+    "navigable": [{ type: Input },],
+    "scrollable": [{ type: Input },],
+    "cellClick": [{ type: Output },],
+    "grid": [{ type: ViewChild, args: [GridComponent,] },],
+    "checkboxColumn": [{ type: ViewChild, args: ['checkboxColumn',] },],
+    "columns": [{ type: ContentChildren, args: [ColumnBase,] },],
+    "toolbarTemplate": [{ type: ContentChild, args: [ToolbarTemplateDirective,] },],
+    "detailTemplate": [{ type: ContentChild, args: [DetailTemplateDirective,] },],
+};
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+class EgGridModule {
+}
+EgGridModule.decorators = [
+    { type: NgModule, args: [{
+                imports: [
+                    CommonModule,
+                    GridModule,
+                    HttpClientModule,
+                    BrowserAnimationsModule,
+                ],
+                declarations: [
+                    EgGridComponent,
+                ],
+                exports: [
+                    EgGridComponent,
+                ]
+            },] },
+];
+/** @nocollapse */
+EgGridModule.ctorParameters = () => [];
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
 
 /**
  * @fileoverview added by tsickle
@@ -610,5 +831,5 @@ SchedulerModule.ctorParameters = () => [];
  * Generated bundle index. Do not edit.
  */
 
-export { SchedulerModule, SchedulerComponent as ɵa };
+export { SchedulerModule, EgGridModule, EgGridComponent as ɵb, SchedulerComponent as ɵa };
 //# sourceMappingURL=eg-ui-common.js.map

@@ -1,8 +1,15 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, LOCALE_ID, NgModule } from '@angular/core';
+import * as tslib_1 from "tslib";
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, LOCALE_ID, NgModule, ContentChild, ContentChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import '@progress/kendo-ui';
 import '@progress/kendo-ui/js/cultures/kendo.culture.hu-HU.js';
 import '@progress/kendo-ui/js/messages/kendo.messages.hu-HU.js';
+import { HttpClient, HttpParams, HttpClientModule } from '@angular/common/http';
+import { ColumnBase, DetailTemplateDirective, GridComponent, ToolbarTemplateDirective, GridModule } from '@progress/kendo-angular-grid';
+import { process } from '@progress/kendo-data-query';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
@@ -594,6 +601,201 @@ SchedulerModule.ctorParameters = function () { return []; };
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
  */
+var EgGridComponent = /** @class */ (function () {
+    /**
+     * @param {?} httpClient
+     */
+    function EgGridComponent(httpClient) {
+        this.httpClient = httpClient;
+        /**
+         * Adatok tömbje.
+         */
+        this.data = [];
+        /**
+         * Rendezhetőség.
+         */
+        this.sortable = true;
+        /**
+         * Szűrhetőség.
+         */
+        this.filterable = true;
+        /**
+         * Csoportosítás.
+         */
+        this.groupable = true;
+        /**
+         * Lapozás.
+         */
+        this.pageable = true;
+        /**
+         * Lapméret.
+         */
+        this.pageSize = 10;
+        /**
+         * Méretezhetőség.
+         */
+        this.resizable = false;
+        /**
+         * Újrarendezhetőség.
+         */
+        this.reorderable = false;
+        /**
+         * Kiválaszhatóság.
+         */
+        this.selectable = false;
+        /**
+         * Billentyűzettel való irányítás.
+         */
+        this.navigable = false;
+        /**
+         * Ki legyen-e jelölve egy adott sor.
+         */
+        this.cellClick = new EventEmitter();
+        /**
+         * Állapot.
+         */
+        this.state = {
+            skip: 0,
+        };
+    }
+    /**
+     * @return {?}
+     */
+    EgGridComponent.prototype.ngOnInit = function () {
+        // Első adatbetöltés:
+        this.dataStateChange(this.state);
+    };
+    /**
+     * @return {?}
+     */
+    EgGridComponent.prototype.ngAfterViewInit = function () {
+        // Ha meg vannak adva oszlopok, beállítjuk őket:
+        if (this.columns && this.columns.length > 0) {
+            // columns:
+            var /** @type {?} */ columnsToRender = tslib_1.__spread(this.columns.toArray());
+            // selectable:
+            if (this.selectable && this.checkboxColumn) {
+                columnsToRender.unshift(this.checkboxColumn);
+            }
+            this.columns.reset(columnsToRender);
+            this.grid.columns = this.columns;
+        }
+        // Ha van detail template, beállítjuk:
+        if (this.detailTemplate) {
+            this.grid.detailTemplate = this.detailTemplate;
+        }
+        // Ha van toolbar template, beállítjuk:
+        if (this.toolbarTemplate) {
+            this.grid.toolbarTemplate = this.toolbarTemplate;
+        }
+        // "Újratöltjük" a gridet:
+        this.grid.ngAfterContentInit();
+    };
+    /**
+     * Adatok betöltése az állapot alapján.
+     * @param {?} state
+     * @return {?}
+     */
+    EgGridComponent.prototype.dataStateChange = function (state) {
+        var _this = this;
+        this.loadData().subscribe(function (data) {
+            var /** @type {?} */ newState = Object.assign({}, state, { take: _this.pageSize });
+            _this.gridView = process(data, newState);
+            _this.state = newState;
+            console.log(_this.state);
+        });
+    };
+    /**
+     * Adatok lekérése.
+     * @return {?}
+     */
+    EgGridComponent.prototype.loadData = function () {
+        // Ha van dataUrl megadva, lekérjük a szervertől az adatokat. Ellenkező esetben a data propertyt használjuk.
+        if (this.dataUrl) {
+            return this.httpClient.get(this.dataUrl, {
+                params: new HttpParams().append('state', JSON.stringify(this.state))
+            });
+        }
+        else {
+            return Observable.of(this.data);
+        }
+    };
+    /**
+     * @param {?} eventType
+     * @return {?}
+     */
+    EgGridComponent.prototype.event = function (eventType) {
+        var _this = this;
+        return function (event) {
+            if (_this[eventType] instanceof EventEmitter) {
+                _this[eventType].emit(event);
+            }
+        };
+    };
+    return EgGridComponent;
+}());
+EgGridComponent.decorators = [
+    { type: Component, args: [{
+                selector: 'eg-grid',
+                template: "<kendo-grid\n  [data]=\"gridView\"\n  [skip]=\"state.skip\"\n  [pageSize]=\"pageSize\"\n  [group]=\"state.group\"\n  [filter]=\"state.filter\"\n  [sort]=\"state.sort\"\n  [sortable]=\"sortable\"\n  [filterable]=\"filterable\"\n  [groupable]=\"groupable\"\n  [pageable]=\"pageable\"\n  [resizable]=\"resizable\"\n  [reorderable]=\"reorderable\"\n  [selectable]=\"selectable\"\n  [height]=\"height\"\n  [navigable]=\"navigable\"\n  [scrollable]=\"scrollable\"\n  (dataStateChange)=\"dataStateChange($event)\"\n  (cellClick)=\"event('cellClick')($event)\"\n>\n  <kendo-grid-checkbox-column *ngIf=\"selectable && columns && columns.length > 0\" #checkboxColumn showSelectAll=\"true\"></kendo-grid-checkbox-column>\n  <!--<ng-content select=\"[kendoGridToolbarTemplate]\" ngProjectAs=\"[kendoGridToolbarTemplate]\"></ng-content>-->\n  <!--<ng-content select=\"kendo-grid-column\" ngProjectAs=\"kendo-grid-column\"></ng-content>-->\n</kendo-grid>\n"
+            },] },
+];
+/** @nocollapse */
+EgGridComponent.ctorParameters = function () { return [
+    { type: HttpClient, },
+]; };
+EgGridComponent.propDecorators = {
+    "data": [{ type: Input },],
+    "dataUrl": [{ type: Input },],
+    "sortable": [{ type: Input },],
+    "filterable": [{ type: Input },],
+    "groupable": [{ type: Input },],
+    "pageable": [{ type: Input },],
+    "pageSize": [{ type: Input },],
+    "resizable": [{ type: Input },],
+    "reorderable": [{ type: Input },],
+    "selectable": [{ type: Input },],
+    "height": [{ type: Input },],
+    "navigable": [{ type: Input },],
+    "scrollable": [{ type: Input },],
+    "cellClick": [{ type: Output },],
+    "grid": [{ type: ViewChild, args: [GridComponent,] },],
+    "checkboxColumn": [{ type: ViewChild, args: ['checkboxColumn',] },],
+    "columns": [{ type: ContentChildren, args: [ColumnBase,] },],
+    "toolbarTemplate": [{ type: ContentChild, args: [ToolbarTemplateDirective,] },],
+    "detailTemplate": [{ type: ContentChild, args: [DetailTemplateDirective,] },],
+};
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
+var EgGridModule = /** @class */ (function () {
+    function EgGridModule() {
+    }
+    return EgGridModule;
+}());
+EgGridModule.decorators = [
+    { type: NgModule, args: [{
+                imports: [
+                    CommonModule,
+                    GridModule,
+                    HttpClientModule,
+                    BrowserAnimationsModule,
+                ],
+                declarations: [
+                    EgGridComponent,
+                ],
+                exports: [
+                    EgGridComponent,
+                ]
+            },] },
+];
+/** @nocollapse */
+EgGridModule.ctorParameters = function () { return []; };
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
@@ -601,5 +803,5 @@ SchedulerModule.ctorParameters = function () { return []; };
 /**
  * Generated bundle index. Do not edit.
  */
-export { SchedulerModule, SchedulerComponent as ɵa };
+export { SchedulerModule, EgGridModule, EgGridComponent as ɵb, SchedulerComponent as ɵa };
 //# sourceMappingURL=eg-ui-common.js.map

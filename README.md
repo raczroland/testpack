@@ -1,27 +1,53 @@
 # EgUiCommon
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.6.
+A repoban két csomag található, ami a Kendo UI for Angulart egészíti ki.
 
-## Development server
+## EgGrid
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Ez egy "wrapper" komponens a Kendo UI Grid komponeneséhez. A feladata, hogy a backendes működés egységesítve legyen, ne kelljen mindenhol megírni. 
 
-## Code scaffolding
+### Használat
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Abban a modulban, ahol használni szeretnénk ezt a komponenst, be kell rakni az `imports` részbe az `EgGridModule`-t.
 
-## Build
+Ezután valamelyik template-ben:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+    <eg-grid [data]="rows" ... > ... </eg-grid>
+    
+A megfelelő helyekre (`...`) további attribútumokat adhatunk meg, illetve megadhatunk egyéb Kendos komponenseket.
 
-## Running unit tests
+Az `eg-grid` tagen belül használhatóak az eredeti Kendo-s komponensek (lásd a kódban, hogy pontosan melyek). Például: `kendo-grid-column`, `kendo-grid-column-group` stb. Ezek modulját viszont importálni kell ugyanúgy külön.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Egyéb
 
-## Running end-to-end tests
+További infókért az eredeti Grid dokumentációt ajánlom:
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+* https://www.telerik.com/kendo-angular-ui/components/grid/
 
-## Further help
+## Scheduler
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+A Kendo  UI for Angular nem tartalmaz (egyelőre) Scheduler-t, ezért a jQuerys verziója köré írtam egy package-et, így Angularban is lehet használni bizonyos limitációk mellett.
+
+Hosszabb távot tekintve a Kendo UI csapata tervezi elkészíteni a Schedulert, ezért a későbbiekben érdemes lehet ránézni, mert az nyilván optimálisabb megoldás lesz, és nem kell behúzni a jQuery-t is.
+
+* Roadmap: https://www.telerik.com/kendo-angular-ui/roadmap/
+
+### Használat
+
+Abban a modulban, ahol használni szeretnénk ezt a komponenst, be kell rakni az `imports` részbe a `SchedulerModule`-t.
+
+    <eg-ui-scheduler ... ></eg-ui-scheduler>
+    
+A megfelelő helyre (`...`) további attribútumokat adhatunk meg (config, adatok stb.).
+
+A lehetséges beállításokért nézd meg a `scheduler.component.ts` fájlban az `@Input()` és az `@Output()` property-ket.
+
+Az eventeket tartalmazó beállítás: `[dataSource]`.
+
+### Egyéb
+
+További infókért az eredeti dokumentációkat ajánlom:
+
+* Ismertető: https://www.telerik.com/kendo-ui/scheduler
+* Leírás: https://docs.telerik.com/kendo-ui/controls/scheduling/scheduler/overview
+* Példák (jQuery-s): https://demos.telerik.com/kendo-ui/scheduler/index
